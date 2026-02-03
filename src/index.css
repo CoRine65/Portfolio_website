@@ -1,3 +1,6 @@
+/* ============================
+   Global reset + typography system
+   ============================ */
 *,
 *::before,
 *::after {
@@ -5,10 +8,15 @@
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Font roles */
+  --font-display: "IBM Plex Sans", Arial, sans-serif; /* headings */
+  --font-body: "Space Grotesk", Arial, sans-serif;    /* paragraphs */
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Base text rendering */
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,24 +26,84 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
 }
 
+html,
 body {
   margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
 }
 
-/* temporary link styling (optional) */
+/* Make sure app inherits body font */
+#root {
+  font-family: var(--font-body);
+}
+
+/* ============================
+   Type hierarchy
+   ============================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.6em;
+}
+
+p {
+  font-family: var(--font-body);
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  opacity: 0.92;
+  margin: 0 0 1em;
+  max-width: 68ch;
+}
+
+/* Airport / metadata */
+.airport {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Optional: meta list helper (recommended) */
+.meta-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 16px 0 0;
+}
+
+.meta-list li {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  opacity: 0.85;
+  margin: 6px 0;
+}
+
+/* Links (temporary; keep if you want) */
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  text-decoration: none;
 }
 
-/* debug layout styles */
+a:hover {
+  opacity: 0.9;
+}
+
+nav a {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+}
+
+/* ============================
+   Debug layout styles (optional)
+   ============================ */
 .site-bg {
   min-height: 100vh;
   background: #62646a;
@@ -45,10 +113,49 @@ a:hover {
 .site-frame {
   max-width: 1100px;
   margin: 0 auto;
-
   border: 2px dashed #ac1616;
   background: #cdb9b9;
-
   padding: 24px;
   border-radius: 12px;
 }
+
+/* ============================
+   images for project cases
+   ============================ */
+
+   .mediaGrid {
+  display: grid;
+  gap: 16px;
+}
+
+/* mobile: stacked */
+@media (max-width: 767px) {
+  .mediaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* tablet + desktop: side-by-side */
+@media (min-width: 768px) {
+  .mediaGrid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+@media (min-width: 768px) {
+  .mediaBox {
+    aspect-ratio: 4 / 3; /* change to 16/9 if you prefer */
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  .mediaBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+

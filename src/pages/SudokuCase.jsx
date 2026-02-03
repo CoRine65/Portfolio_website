@@ -1,4 +1,8 @@
 import ProjectCaseLayout from "../layout/ProjectCaseLayout";
+import placeholder1 from "../assets/placeholder1.jpg";
+import placeholder2 from "../assets/placeholder2.jpg";
+import github from "../assets/github.svg";
+import linkedin from "../assets/linkedin.svg";
 
 export default function SudokuCase() {
   return (
@@ -10,7 +14,7 @@ export default function SudokuCase() {
             and clean UX.
           </p>
 
-          <ul>
+          <ul className="meta-list">
             <li><strong>Stack:</strong> React + Vite </li>
             <li><strong>Focus:</strong> UI + logic + polish </li>
             <li><strong>Status:</strong> In progress </li>
@@ -20,18 +24,22 @@ export default function SudokuCase() {
       actions={
         <>
           <a>
-            github
+            <img src={github} alt="GitHub" width="24"/>
           </a>
           <a>
-            live 
+            <img src={linkedin} alt="Linkedin" width="24"/> 
           </a>
         </>
       }
       media={
-        <>
-          <div className="mediaBox">[ image placeholder ]</div>
-          <div className="mediaBox">[ gif placeholder ]</div>
-        </>
+        <div className="mediaGrid">
+          <div className="mediaBox">
+            <img src={placeholder1} alt="computer"></img>
+          </div>
+          <div className="mediaBox">
+            <img src={placeholder2} alt="keyboard"></img>
+          </div>
+        </div>
       }
     >
 

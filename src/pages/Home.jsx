@@ -16,10 +16,10 @@ export default function Home() {
       <nav style={{ display: "flex", gap: "12px" }}>
 
         
-        <div style={cardStyle}><Link to="/projects/sudoku">Sudoku Page</Link></div>
-        <div style={cardStyle}><Link to="/projects/bakery">Bakery Page</Link></div>
-        <div style={cardStyle}><Link to="/about">About</Link></div>
-        <div style={cardStyle}><Link to="/contact">Contact</Link></div>
+        <div className = "airport" style={cardStyle}><Link to="/projects/sudoku">Sudoku Page</Link></div>
+        <div className = "airport" style={cardStyle}><Link to="/projects/bakery">Bakery Page</Link></div>
+        <div className = "airport" style={cardStyle}><Link to="/about">About</Link></div>
+        <div className = "airport" style={cardStyle}><Link to="/contact">Contact</Link></div>
         
         
         

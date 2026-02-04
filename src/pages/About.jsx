@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function About() {
   return (
-    <main className="about">
+    <main className="page">
 
       <header className="about_header">
         <h1> About Me </h1>
@@ -18,17 +18,7 @@ export default function About() {
         </p>
       </section>
 
-  
-
-
-
-
-
-
-
-
-
-      <nav className="about_nav">
+      <nav className="simple_nav">
         <Link to="/">Home</Link>
         <Link to="/Contact">    Contact</Link>
       </nav>

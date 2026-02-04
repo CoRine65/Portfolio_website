@@ -4,7 +4,7 @@ import linkedin from "../assets/linkedin.svg"
 
 export default function Contact() {
   return (
-    <div>
+    <div className="page">
       <h1>Contact</h1>
 
       <p>
@@ -14,6 +14,7 @@ export default function Contact() {
         </a>
       </p>
 
+      <div className="contact-icons"> 
       <a href="https://github.com/CoRine65"
         target="_blank"
         rel="noreferrer">
@@ -25,8 +26,8 @@ export default function Contact() {
         rel="noreferrer">
         <img src={linkedin} alt="Linkedin" width="24"/>
       </a>
-
-      <nav style={{ display: "flex", gap: "12px" }}>
+      </div>
+      <nav className="simple-nav">
         <Link to="/">Home</Link>
       </nav>
     </div>

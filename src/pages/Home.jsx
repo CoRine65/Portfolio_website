@@ -1,31 +1,25 @@
 import { Link } from "react-router-dom";
-const cardStyle = {
-  width: "200px",
-  height: "120px",
-  border: "1px dashed gray",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
+
 
 
 export default function Home() {
   return (
-    <div>
+    <div className="page">
       <h1>Catherine</h1>
-      <nav style={{ display: "flex", gap: "12px" }}>
-
-        
-        <div className = "airport" style={cardStyle}><Link to="/projects/sudoku">Sudoku Page</Link></div>
-        <div className = "airport" style={cardStyle}><Link to="/projects/bakery">Bakery Page</Link></div>
-        <div className = "airport" style={cardStyle}><Link to="/about">About</Link></div>
-        <div className = "airport" style={cardStyle}><Link to="/contact">Contact</Link></div>
-        
-        
-        
-        
+      <nav className="home-nav">
+        <div className = "airport card">
+          <Link to="/projects/sudoku">Sudoku Page</Link>
+        </div>
+        <div className = "airport card">
+          <Link to="/projects/bakery">Bakery Page</Link>
+        </div>
+        <div className = "airport card">
+          <Link to="/about">About</Link>
+        </div>
+        <div className = "airport card">
+          <Link to="/contact">Contact</Link>
+        </div>
       </nav>
-
     </div>
   );
 }

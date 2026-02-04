@@ -1,26 +1,10 @@
 /* ============================
-   Global reset + typography system
-   ============================ */
+   1) Reset
+============================ */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-:root {
-  /* Font roles */
-  --font-display: "IBM Plex Sans", Arial, sans-serif; /* headings */
-  --font-body: "Space Grotesk", Arial, sans-serif;    /* paragraphs */
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
-
-  /* Base text rendering */
-  line-height: 1.5;
-  font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 html,
@@ -34,47 +18,80 @@ body {
   margin: 0;
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-body);
+/* ============================
+   2) Design tokens (fonts + colors)
+============================ */
+:root {
+  /* Fonts */
+  --font-display: "IBM Plex Sans", Arial, sans-serif;
+  --font-body: "Space Grotesk", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Colors */
+  --bg-base: #1a1c1e;     /* page background */
+  --bg-surface: #222629;  /* cards/panels */
+  --bg-subtle: #2b5a6c;   /* hover surface */
+
+  --text-primary: #e8eeef;      /* headings + main text */
+  --text-secondary: #d6e0dd;    /* paragraphs (less muted than your current) */
+  --text-muted: #aab6b2;        /* meta/airport (a touch dimmer) */
+
+  --accent: #2b5a6c;                   /* links/focus */
+  --accent-soft: rgba(43, 90, 108, 0.18); /* soft wash behind media */
+  
+  /* Rendering */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Make sure app inherits body font */
+/* ============================
+   3) Global base styles
+============================ */
+body {
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  line-height: 1.55;
+}
+
+/* Make sure app inherits */
 #root {
   font-family: var(--font-body);
 }
 
 /* ============================
-   Type hierarchy
-   ============================ */
+   4) Typography
+============================ */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.03em;
+  color: var(--text-primary);
   margin: 0 0 0.6em;
 }
 
 p {
-  font-family: var(--font-body);
-  line-height: 1.65;
-  letter-spacing: -0.01em;
-  opacity: 0.92;
   margin: 0 0 1em;
   max-width: 68ch;
+  line-height: 1.65;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
 }
 
-/* Airport / metadata */
+/* Mono utility */
 .airport {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 13px;
-  opacity: 0.85;
+  opacity: 0.92;
+  color: var(--text-muted);
 }
 
-/* Optional: meta list helper (recommended) */
+/* Meta list (case header) */
 .meta-list {
   list-style: none;
   padding-left: 0;
@@ -86,17 +103,28 @@ p {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 13px;
-  opacity: 0.85;
+  opacity: 0.92;
+  color: var(--text-muted);
   margin: 6px 0;
 }
 
-/* Links (temporary; keep if you want) */
+/* ============================
+   5) Links + nav
+============================ */
 a {
+  color: var(--text-primary);
   text-decoration: none;
 }
 
 a:hover {
-  opacity: 0.9;
+  color: var(--text-primary);
+  opacity: 0.92;
+}
+
+/* Optional: if you want “accent on hover” */
+a:hover {
+  color: var(--accent);
+  opacity: 1;
 }
 
 nav a {
@@ -107,64 +135,19 @@ nav a {
 }
 
 /* ============================
-   images for project cases
-   ============================ */
-
-   .mediaGrid {
-  display: grid;
-  gap: 16px;
-}
-
-/* mobile: stacked */
-@media (max-width: 767px) {
-  .mediaGrid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* tablet + desktop: side-by-side */
-@media (min-width: 768px) {
-  .mediaGrid {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-}
-
-@media (min-width: 768px) {
-  .mediaBox {
-    aspect-ratio: 4 / 3; /* change to 16/9 if you prefer */
-    overflow: hidden;
-    border-radius: 10px;
-  }
-
-  .mediaBox img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-}
-
-/* ============================
-    project cases + home case
-   ============================ */
+   6) Layout containers
+============================ */
+.page,
 .case {
-  width: 100%;
-  max-width: 1100px; 
-  margin: 0 auto;
-  padding: 48px 24px;
-}
-
-.page {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
   padding: 48px 24px;
 }
-/* ============================
-    home cards
-   ============================ */
 
+/* ============================
+   7) Home cards
+============================ */
 .home-nav {
   display: grid;
   gap: 12px;
@@ -178,7 +161,7 @@ nav a {
   }
 }
 
-/* tablet/desktop: horizontal grid */
+/* tablet/desktop: 1 row 4 columns */
 @media (min-width: 768px) {
   .home-nav {
     grid-template-columns: repeat(4, 1fr);
@@ -187,28 +170,79 @@ nav a {
 
 .card {
   height: 120px;
-  border: 1px dashed gray;
+  border: 1px dashed rgba(232, 238, 239, 0.35);
+  background: var(--bg-surface);
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  background: var(--bg-subtle);
+  border-color: rgba(232, 238, 239, 0.55);
+}
+
+/* Make whole card clickable */
+.card a {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--text-primary);
+}
+
+
+/* ============================
+   8) Case media
+============================ */
+.mediaGrid {
+  display: grid;
+  gap: 16px;
+}
+
+/* mobile: stacked */
+@media (max-width: 767px) {
+  .mediaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* tablet+desktop: 2 columns */
+@media (min-width: 768px) {
+  .mediaGrid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .mediaBox {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--accent-soft);
+  }
+
+  .mediaBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 }
 
 /* ============================
-    navigations
-   ============================ */
+   9) Simple nav + contact icons
+============================ */
 .simple-nav {
   display: flex;
   gap: 14px;
   margin-top: 24px;
-
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 12px;
 }
 
-/* Contact icons */
 .contact-icons {
   display: flex;
   gap: 12px;
@@ -219,7 +253,7 @@ nav a {
   width: 22px;
   height: 22px;
   opacity: 0.9;
-  transition: opacity .2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .contact-icons img:hover {

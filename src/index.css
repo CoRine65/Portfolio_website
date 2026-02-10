@@ -1,6 +1,3 @@
-/* ============================
-   1) Reset
-============================ */
 *,
 *::before,
 *::after {
@@ -15,7 +12,9 @@ body,
 }
 
 body {
-  margin: 0;
+  margin: 0; 
+
+  font-size: 18px;
 }
 
 /* ============================
@@ -34,10 +33,10 @@ body {
   --bg-subtle: #2b5a6c;   /* hover surface */
 
   --text-primary: #e8eeef;      /* headings + main text */
-  --text-secondary: #d6e0dd;    /* paragraphs (less muted than your current) */
-  --text-muted: #aab6b2;        /* meta/airport (a touch dimmer) */
+  --text-secondary: #a3adb5;    /* paragraphs (less muted than your current) */
+  --text-muted: #d3d6e3;        /* meta/airport (a touch dimmer) */
 
-  --accent: #2b5a6c;                   /* links/focus */
+  --accent: #3ebe8b;                   /* links/focus */
   --accent-soft: rgba(43, 90, 108, 0.18); /* soft wash behind media */
   
   /* Rendering */
@@ -73,10 +72,23 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 0 0.6em;
 }
 
+h1{
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 1.7;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: clamp(1.4rem, 2vw, 1.85rem);
+  line-height: 1.2;
+  margin-top: 1.6em;
+}
+
 p {
+  font-size: 1.2rem;
   margin: 0 0 1em;
   max-width: 68ch;
-  line-height: 1.65;
+  line-height: 1.7;
   letter-spacing: -0.01em;
   color: var(--text-secondary);
 }
@@ -86,7 +98,7 @@ p {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.92;
   color: var(--text-muted);
 }
@@ -102,7 +114,7 @@ p {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 13px;
+  font-size: 15px;
   opacity: 0.92;
   color: var(--text-muted);
   margin: 6px 0;
@@ -131,7 +143,7 @@ nav a {
   font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* ============================
@@ -170,7 +182,7 @@ nav a {
 
 .card {
   height: 120px;
-  border: 1px dashed rgba(232, 238, 239, 0.35);
+  /*border: 1px dashed rgba(232, 238, 239, 0.35);*/
   background: var(--bg-surface);
 
   display: flex;

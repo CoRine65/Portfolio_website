@@ -1,3 +1,6 @@
+/* ============================
+   0) Reset / base box model
+============================ */
 *,
 *::before,
 *::after {
@@ -12,13 +15,12 @@ body,
 }
 
 body {
-  margin: 0; 
-
+  margin: 0;
   font-size: 18px;
 }
 
 /* ============================
-   2) Design tokens (fonts + colors)
+   1) Design tokens (fonts + colors)
 ============================ */
 :root {
   /* Fonts */
@@ -28,17 +30,17 @@ body {
     Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Colors */
-  --bg-base: #1a1c1e;     /* page background */
-  --bg-surface: #222629;  /* cards/panels */
-  --bg-subtle: #2b5a6c;   /* hover surface */
+  --bg-base: #1a1c1e;
+  --bg-surface: #222629;
+  --bg-subtle: #2b5a6c;
 
-  --text-primary: #e8eeef;      /* headings + main text */
-  --text-secondary: #a3adb5;    /* paragraphs (less muted than your current) */
-  --text-muted: #d3d6e3;        /* meta/airport (a touch dimmer) */
+  --text-primary: #e8eeef;
+  --text-secondary: #a3adb5;
+  --text-muted: #d3d6e3;
 
-  --accent: #3ebe8b;                   /* links/focus */
-  --accent-soft: rgba(43, 90, 108, 0.18); /* soft wash behind media */
-  
+  --accent: #3ebe8b;
+  --accent-soft: rgba(43, 90, 108, 0.18);
+
   /* Rendering */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -47,7 +49,7 @@ body {
 }
 
 /* ============================
-   3) Global base styles
+   2) Global base styles
 ============================ */
 body {
   background: var(--bg-base);
@@ -56,13 +58,12 @@ body {
   line-height: 1.55;
 }
 
-/* Make sure app inherits */
 #root {
   font-family: var(--font-body);
 }
 
 /* ============================
-   4) Typography
+   3) Typography
 ============================ */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
@@ -72,9 +73,9 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0 0 0.6em;
 }
 
-h1{
+h1 {
   font-size: clamp(2.2rem, 4vw, 3.2rem);
-  line-height: 1.7;
+  line-height: 1.1;
   margin-bottom: 0.5em;
 }
 
@@ -103,37 +104,14 @@ p {
   color: var(--text-muted);
 }
 
-/* Meta list (case header) */
-.meta-list {
-  list-style: none;
-  padding-left: 0;
-  margin: 16px 0 0;
-}
-
-.meta-list li {
-  font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 15px;
-  opacity: 0.92;
-  color: var(--text-muted);
-  margin: 6px 0;
-}
-
 /* ============================
-   5) Links + nav
+   4) Links + nav
 ============================ */
 a {
   color: var(--text-primary);
   text-decoration: none;
 }
 
-a:hover {
-  color: var(--text-primary);
-  opacity: 0.92;
-}
-
-/* Optional: if you want “accent on hover” */
 a:hover {
   color: var(--accent);
   opacity: 1;
@@ -147,7 +125,7 @@ nav a {
 }
 
 /* ============================
-   6) Layout containers
+   5) Layout containers
 ============================ */
 .page,
 .case {
@@ -158,56 +136,198 @@ nav a {
 }
 
 /* ============================
-   7) Home cards
+   6) Home grid
 ============================ */
 .home-nav {
   display: grid;
   gap: 12px;
   margin-top: 24px;
+  grid-template-columns: 1fr;
 }
 
-/* mobile: stacked */
-@media (max-width: 767px) {
-  .home-nav {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* tablet/desktop: 1 row 4 columns */
 @media (min-width: 768px) {
   .home-nav {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
+/* ============================
+   7) Home cards (simple glass + expand)
+   Structure assumption:
+   <div class="card">
+     <a class="cardLink" ...>
+       <div class="cardTitle">Title</div>
+       <ul class="cardMeta">
+         <li><span class="airportLoad">Item</span></li>
+       </ul>
+     </a>
+   </div>
+============================ */
 .card {
   height: 120px;
-  /*border: 1px dashed rgba(232, 238, 239, 0.35);*/
-  background: var(--bg-surface);
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* idle surface */
+  background: rgba(34, 38, 41, 0.72);
+  border: 1px solid rgba(232, 238, 239, 0.08);
 
-  transition: background 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+
+  transform: translateZ(0);
+  transition:
+  height 260ms ease,
+  border-color 240ms ease,
+  box-shadow 240ms ease,
+  background 240ms ease;
 }
 
-.card:hover {
-  background: var(--bg-subtle);
-  border-color: rgba(232, 238, 239, 0.55);
-}
-
-/* Make whole card clickable */
-.card a {
+/* whole card clickable */
+.cardLink {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: var(--text-primary);
+  position: relative;
+  display: block;
+  padding: 0;
 }
 
+/* Title starts centered */
+.cardTitle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 15px;
+  color: var(--text-primary);
+  opacity: 0.92;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 36px);
+
+  transition:
+    left 260ms ease,
+    top 260ms ease,
+    transform 260ms ease,
+    opacity 260ms ease;
+}
+
+/* Meta list hidden by default */
+.cardMeta {
+  position: absolute;
+  left: 18px;
+  top: 52px;
+  bottom: auto;
+
+  list-style: disc;
+  list-style-position: outside; 
+  padding-left: 18px;
+
+  margin: 0;
+
+  display: grid;
+  gap: 2px;              /* tighter spacing between items */
+
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 240ms ease;
+}
+
+.cardMeta li {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  line-height: 1.25;     /* tighter line spacing */
+  color: var(--text-muted);
+  opacity: 0.95;
+}
+
+
+/* Expanded state */
+.card:hover,
+.card:focus-within {
+  height: 200px; /* gives space for bullets */
+
+  background: rgba(43, 90, 108, 0.22);
+  border-color: rgba(62, 190, 139, 0.35);
+
+  box-shadow:
+    0 16px 44px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* title moves top-left */
+.card:hover .cardTitle,
+.card:focus-within .cardTitle {
+  left: 18px;
+  top: 14px;
+  transform: translate(0, 0);
+  opacity: 1;
+}
+
+/* meta fades in */
+.card:hover .cardMeta,
+.card:focus-within .cardMeta {
+
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optional sibling dim (nice, not required)
+   Add a wrapper class to the grid: <div class="home-nav dimSiblings"> */
+.home-nav.dimSiblings:hover .card {
+  opacity: 0.55;
+  transition: opacity 180ms ease;
+}
+.home-nav.dimSiblings:hover .card:hover {
+  opacity: 1;
+}
+
+/* Airport "loading dots" effect */
+.airportLoad::after {
+  content: none;
+  display: none;
+}
+
+/*
+@keyframes dotsWidth {
+  0%   { width: 0em; }
+  33%  { width: 0.4em; }
+  66%  { width: 0.8em; }
+  100% { width: 1.2em; }
+}
+
+@keyframes dots {
+  0%   { content: ""; }
+  25%  { content: "."; }
+  50%  { content: ".."; }
+  100% { content: ""; }
+}*/
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .cardTitle,
+  .cardMeta {
+    transition: none;
+  }
+  .airportLoad::after {
+    animation: none;
+    content: "";
+  }
+}
 
 /* ============================
    8) Case media
@@ -217,14 +337,12 @@ nav a {
   gap: 16px;
 }
 
-/* mobile: stacked */
 @media (max-width: 767px) {
   .mediaGrid {
     grid-template-columns: 1fr;
   }
 }
 
-/* tablet+desktop: 2 columns */
 @media (min-width: 768px) {
   .mediaGrid {
     grid-template-columns: 1fr 1fr;

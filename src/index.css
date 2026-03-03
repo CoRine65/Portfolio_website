@@ -389,3 +389,31 @@ nav a {
 .contact-icons img:hover {
   opacity: 1;
 }
+
+/* background */ 
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* keep it behind, but avoid weird blending with body backgrounds */
+  display: block;
+}
+
+.app-stack {
+  position: relative;
+  z-index: 1;
+}
+
+/* home page adjustments */
+body.is-home .page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Push the card grid down */
+body.is-home .home-nav {
+  margin-top: auto;
+  padding-bottom: 32px; /* tweak */
+}

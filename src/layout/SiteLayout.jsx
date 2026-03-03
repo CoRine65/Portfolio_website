@@ -1,11 +1,13 @@
 import { Outlet } from "react-router-dom";
+import CanvasBackground from "../components/CanvasBackground";
 
 export default function SiteLayout() {
     return (
-        <div className="site-bg">
-            <div className="site-frame">
-                <Outlet />
-            </div>
-        </div>
+       <>
+      <CanvasBackground />
+      <div className="app-stack">
+        <Outlet />
+      </div>
+    </>
     );
 }

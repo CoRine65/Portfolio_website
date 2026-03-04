@@ -31,85 +31,22 @@ function rand(min, max) {
   return min + Math.random() * (max - min);
 }
 
-function lerp(a, b, t) {
-  return a + (b - a) * t;
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function easeInOut(t) {
-  // smoothstep-ish
-  return t * t * (3 - 2 * t);
-}
-
-function pickStart(w, h) {
-  // Start near edges, but not corners. Feels like it "enters" the space.
-  const side = Math.floor(Math.random() * 4); // 0 top, 1 right, 2 bottom, 3 left
-  const pad = 40;
-
-  if (side === 0) return { x: rand(pad, w - pad), y: rand(pad, h * 0.18) };
-  if (side === 1) return { x: rand(w * 0.82, w - pad), y: rand(pad, h - pad) };
-  if (side === 2) return { x: rand(pad, w - pad), y: rand(h * 0.82, h - pad) };
-  return { x: rand(pad, w * 0.18), y: rand(pad, h - pad) };
-}
-
-function createStem(w, h) {
-  const start = pickStart(w, h);
-
-  const baseAngle = rand(-Math.PI, Math.PI);
-  const thickness = rand(1.2, 2.2);
-  const step = rand(1.7, 2.6); // pixels per segment step (slow, delicate)
-  const maxSegments = Math.floor(rand(520, 860));
-
-  return {
-    id: crypto?.randomUUID?.() ?? String(Math.random()),
-    state: "growing", // growing | fading
-    opacity: 0,
-    fade: 0, // 0..1
-
-    // Growth
-    segments: [{ x: start.x, y: start.y, a: baseAngle }],
-    leaves: [],
-
-    step,
-    thickness,
-    maxSegments,
-
-    // Curvature "personality"
-    bend: rand(0.012, 0.028),       // how strongly it turns
-    noise: rand(0.008, 0.018),      // extra wobble
-    drift: rand(-0.002, 0.002),     // slow bias
-
-    // Leaf behavior
-    leafEvery: Math.floor(rand(22, 34)), // every N segments attempt sprout
-    leafSide: Math.random() < 0.5 ? -1 : 1, // alternate sides
-  };
-}
-
-function makeLeaf(segA, segB, side, thickness) {
-  // Spawn at segment B, oriented roughly perpendicular to the segment direction
-  const dx = segB.x - segA.x;
-  const dy = segB.y - segA.y;
-  const len = Math.max(0.0001, Math.hypot(dx, dy));
-  const nx = (-dy / len) * side;
-  const ny = (dx / len) * side;
-
-  const size = rand(6, 12) + thickness * 2.2;
-
-  return {
-    x: segB.x + nx * rand(2, 6),
-    y: segB.y + ny * rand(2, 6),
-    nx,
-    ny,
-    size,
-    t: 0, // growth 0..1
-    life: 1, // 1..0 fade with stem
-  };
+function hexToRgb(hex) {
+  const h = hex.replace("#", "").trim();
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(full, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
 
 export default function CanvasBackground() {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
-  const stemsRef = useRef([]); // array of stems (we'll keep max 2 during overlap)
   const lastTimeRef = useRef(0);
+  const bubblesRef = useRef([]);
 
   const prefersReducedMotionRef = usePrefersReducedMotion();
 
@@ -121,6 +58,67 @@ export default function CanvasBackground() {
     if (!ctx) return;
 
     const getSize = () => ({ w: window.innerWidth, h: window.innerHeight });
+
+    const getThemePalette = () => {
+      const root = getComputedStyle(document.documentElement);
+      const accent = root.getPropertyValue("--accent").trim() || "#3ebe8b";
+      const subtle = root.getPropertyValue("--bg-subtle").trim() || "#2b5a6c";
+      const text = root.getPropertyValue("--text-primary").trim() || "#e8eeef";
+      return [accent, subtle, text];
+    };
+
+    const makeBubble = (w, h, palette) => {
+      const base = pick(palette);
+      const { r, g, b } = hexToRgb(base);
+
+      const z = rand(0, 1); // 0 far, 1 near
+      const type = Math.random() < 0.3 ? "orb" : "mist"; // more orbs for 3D read
+
+      const baseR = Math.min(w, h);
+
+      // Spawn anywhere (slightly beyond bounds so edges feel natural)
+      const radius =
+        type === "orb"
+          ? rand(baseR * 0.05, baseR * 0.10) * (0.85 + z * 0.35)
+          : rand(baseR * 0.06, baseR * 0.16) * (0.75 + z * 0.3);
+
+      const x = rand(-radius * 0.2, w + radius * 0.2);
+      const y = rand(-radius * 0.2, h + radius * 0.2);
+
+      const alphaMax =
+        type === "orb"
+          ? rand(0.11, 0.20) * (0.7 + z * 0.6)
+          : rand(0.05, 0.12) * (0.6 + z * 0.5);
+
+      const blur =
+        type === "orb"
+          ? rand(0, 6)
+          : rand(10, 26);
+
+      const driftX = rand(-10, 10) * (0.5 + z * 1.0);
+      const driftY = rand(-18, -6) * (0.5 + z * 1.0);
+
+      const lifespan = rand(8, 15);
+      const age = 0;
+
+      return {
+        x,
+        y,
+        radius,
+        vx: driftX,
+        vy: driftY,
+        lifespan,
+        age,
+        r,
+        g,
+        b,
+        alphaMax,
+        blur,
+        wobbleSeed: rand(0, 1000),
+        z,
+        type,
+      };
+    };
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -134,284 +132,174 @@ export default function CanvasBackground() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
 
-      // Ensure we always have at least one stem ready after resize
-      if (stemsRef.current.length === 0) {
-        stemsRef.current.push(createStem(w, h));
-      }
+      const palette = getThemePalette();
+      const target = prefersReducedMotionRef.current ? 6 : 12;
+
+      bubblesRef.current = Array.from({ length: target }, () =>
+        makeBubble(w, h, palette)
+      );
     };
 
     const drawAtmosphere = (w, h) => {
-      // Soft depth wash (still restrained)
       const g = ctx.createRadialGradient(
-        w * 0.5,
+        w * 0.55,
         h * 0.35,
         Math.min(w, h) * 0.12,
-        w * 0.5,
+        w * 0.55,
         h * 0.35,
-        Math.min(w, h) * 0.95
+        Math.min(w, h) * 1.0
       );
-      g.addColorStop(0, "rgba(255,255,255,0.045)");
+      g.addColorStop(0, "rgba(255,255,255,0.04)");
       g.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
     };
 
-    const drawStem = (stem) => {
-      const segs = stem.segments;
-      if (segs.length < 2) return;
+    const drawBubble = (b, ts) => {
+      const t = clamp(b.age / b.lifespan, 0, 1);
+      const fadeIn = clamp(t / 0.18, 0, 1);
+      const fadeOut = clamp((1 - t) / 0.22, 0, 1);
+      const a = b.alphaMax * fadeIn * fadeOut;
 
-      const alpha = stem.state === "fading" ? (1 - stem.fade) : stem.opacity;
+      if (a <= 0.0005) return;
 
-      // Colors: monochrome token-ish; keep subtle
-      const main = `rgba(232, 238, 239, ${0.10 * alpha})`;
-      const glow = `rgba(232, 238, 239, ${0.06 * alpha})`;
-      const shadow = `rgba(0, 0, 0, ${0.10 * alpha})`;
+      // Slight wobble
+      const wobble = Math.sin((ts / 1000 + b.wobbleSeed) * 0.6) * 6;
+      const px = b.x + wobble * 0.25;
+      const py = b.y;
 
-      // Shadow pass (tiny offset)
       ctx.save();
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = shadow;
-      ctx.lineWidth = stem.thickness + 1.6;
-      ctx.beginPath();
-      ctx.moveTo(segs[0].x + 1.5, segs[0].y + 2.0);
-      for (let i = 1; i < segs.length; i++) {
-        ctx.lineTo(segs[i].x + 1.5, segs[i].y + 2.0);
-      }
-      ctx.stroke();
-      ctx.restore();
+      ctx.globalAlpha = 1;
 
-      // Glow pass
-      ctx.save();
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = glow;
-      ctx.lineWidth = stem.thickness + 2.8;
-      ctx.beginPath();
-      ctx.moveTo(segs[0].x, segs[0].y);
-      for (let i = 1; i < segs.length; i++) ctx.lineTo(segs[i].x, segs[i].y);
-      ctx.stroke();
-      ctx.restore();
+      // MIST
+      if (b.type === "mist") {
+        ctx.filter = `blur(${b.blur}px)`;
 
-      // Main pass
-      ctx.save();
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.strokeStyle = main;
-      ctx.lineWidth = stem.thickness;
-      ctx.beginPath();
-      ctx.moveTo(segs[0].x, segs[0].y);
-      for (let i = 1; i < segs.length; i++) ctx.lineTo(segs[i].x, segs[i].y);
-      ctx.stroke();
-      ctx.restore();
+        const g = ctx.createRadialGradient(
+          px - b.radius * 0.25,
+          py - b.radius * 0.25,
+          b.radius * 0.1,
+          px,
+          py,
+          b.radius
+        );
 
-      // Leaves
-      for (const leaf of stem.leaves) {
-        const lt = clamp(leaf.t, 0, 1);
-        const grow = easeInOut(lt);
-        const life = stem.state === "fading" ? (1 - stem.fade) : 1;
+        g.addColorStop(0, `rgba(${b.r},${b.g},${b.b},${a})`);
+        g.addColorStop(1, `rgba(${b.r},${b.g},${b.b},0)`);
 
-        const a = 0.08 * alpha * life * grow;
-        if (a <= 0.001) continue;
-
-        // simple leaf: curved teardrop-ish
-        const size = leaf.size * grow;
-
-        const px = leaf.x;
-        const py = leaf.y;
-
-        // perpendicular direction for "leaf"
-        const nx = leaf.nx;
-        const ny = leaf.ny;
-
-        const tipX = px + nx * size * 1.2;
-        const tipY = py + ny * size * 1.2;
-
-        const backX = px - nx * size * 0.25;
-        const backY = py - ny * size * 0.25;
-
-        const sideX = px + (ny) * size * 0.35;
-        const sideY = py - (nx) * size * 0.35;
-
-        const side2X = px - (ny) * size * 0.35;
-        const side2Y = py + (nx) * size * 0.35;
-
-        // shadow
-        ctx.save();
-        ctx.fillStyle = `rgba(0,0,0,${0.10 * alpha * life * grow})`;
+        ctx.fillStyle = g;
         ctx.beginPath();
-        ctx.moveTo(backX + 1.2, backY + 1.8);
-        ctx.quadraticCurveTo(sideX + 1.2, sideY + 1.8, tipX + 1.2, tipY + 1.8);
-        ctx.quadraticCurveTo(side2X + 1.2, side2Y + 1.8, backX + 1.2, backY + 1.8);
-        ctx.closePath();
+        ctx.arc(px, py, b.radius, 0, Math.PI * 2);
         ctx.fill();
+
         ctx.restore();
-
-        // leaf
-        ctx.save();
-        ctx.fillStyle = `rgba(232,238,239,${a})`;
-        ctx.beginPath();
-        ctx.moveTo(backX, backY);
-        ctx.quadraticCurveTo(sideX, sideY, tipX, tipY);
-        ctx.quadraticCurveTo(side2X, side2Y, backX, backY);
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-      }
-    };
-
-    const stepStem = (stem, dt, w, h) => {
-      // Fade-in at birth
-      stem.opacity = clamp(stem.opacity + dt * 0.25, 0, 1);
-
-      // leaf growth timing
-      for (const leaf of stem.leaves) {
-        leaf.t = clamp(leaf.t + dt * 0.6, 0, 1);
-      }
-
-      if (stem.state === "fading") {
-        stem.fade = clamp(stem.fade + dt * 0.18, 0, 1);
         return;
       }
 
-      // Grow by adding segments over time, but cap per frame for stability
-      const segsToAdd = clamp(Math.floor(dt * 60 * 0.9), 1, 3); // 1-3 segments/frame depending on dt
+      // ORB (more 3D)
+      ctx.filter = `blur(${b.blur}px)`;
 
-      for (let k = 0; k < segsToAdd; k++) {
-        if (stem.segments.length >= stem.maxSegments) {
-          stem.state = "fading";
-          break;
-        }
+      const core = ctx.createRadialGradient(
+        px - b.radius * 0.22,
+        py - b.radius * 0.28,
+        b.radius * 0.08,
+        px,
+        py,
+        b.radius
+      );
+      core.addColorStop(0, `rgba(${b.r},${b.g},${b.b},${a})`);
+      core.addColorStop(1, `rgba(${b.r},${b.g},${b.b},${a * 0.25})`);
 
-        const last = stem.segments[stem.segments.length - 1];
-        // eslint-disable-next-line no-unused-vars
-        const prev = stem.segments[Math.max(0, stem.segments.length - 2)] ?? last;
+      ctx.fillStyle = core;
+      ctx.beginPath();
+      ctx.arc(px, py, b.radius, 0, Math.PI * 2);
+      ctx.fill();
 
-        // Turn gently with wobble
-        const t = stem.segments.length;
-        const wobble = Math.sin(t * 0.11) * stem.noise + Math.sin(t * 0.037) * (stem.noise * 0.6);
-        let a = last.a + wobble + stem.drift;
+      // rim + highlight (no blur)
+      ctx.filter = "none";
 
-        // Keep curving, but not spiral
-        a += rand(-stem.bend, stem.bend);
+      ctx.strokeStyle = `rgba(232,238,239,${a * 0.28})`;
+      ctx.lineWidth = Math.max(1, b.radius * 0.02);
+      ctx.beginPath();
+      ctx.arc(px, py, b.radius * 0.98, 0, Math.PI * 2);
+      ctx.stroke();
 
-        const nx = Math.cos(a);
-        const ny = Math.sin(a);
+      ctx.fillStyle = `rgba(232,238,239,${a * 0.35})`;
+      ctx.beginPath();
+      ctx.arc(
+        px - b.radius * 0.28,
+        py - b.radius * 0.32,
+        b.radius * 0.12,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
 
-        const next = {
-          x: last.x + nx * stem.step,
-          y: last.y + ny * stem.step,
-          a,
-        };
-
-        // Soft boundary steering (keeps it in view)
-        const margin = 40;
-        if (next.x < margin) next.a = lerp(next.a, 0, 0.25);
-        if (next.x > w - margin) next.a = lerp(next.a, Math.PI, 0.25);
-        if (next.y < margin) next.a = lerp(next.a, Math.PI / 2, 0.25);
-        if (next.y > h - margin) next.a = lerp(next.a, -Math.PI / 2, 0.25);
-
-        stem.segments.push(next);
-
-        // Leaf spawn rule: every N segments, chance to sprout
-        const idx = stem.segments.length - 1;
-        if (idx > 12 && idx % stem.leafEvery === 0) {
-          // low probability to keep density restrained
-          if (Math.random() < 0.55 && stem.leaves.length < 18) {
-            const aSeg = stem.segments[idx - 1];
-            const bSeg = stem.segments[idx];
-
-            const leaf = makeLeaf(aSeg, bSeg, stem.leafSide, stem.thickness);
-            stem.leaves.push(leaf);
-
-            // Alternate sides so it feels intentional
-            stem.leafSide *= -1;
-          }
-        }
-      }
-    };
-
-    const ensureChain = (w, h) => {
-      const stems = stemsRef.current;
-      if (stems.length === 0) {
-        stems.push(createStem(w, h));
-        return;
-      }
-
-      // Keep at most 2 stems (overlap)
-      while (stems.length > 2) stems.shift();
-
-      const current = stems[stems.length - 1];
-      const progress = current.segments.length / current.maxSegments;
-
-      // Option A: when current is ~80% done, start next one
-      if (progress >= 0.8 && stems.length === 1) {
-        stems.push(createStem(w, h));
-      }
-
-      // If the oldest fully faded, remove it
-      if (stems.length === 2) {
-        const oldest = stems[0];
-        if (oldest.state === "fading" && oldest.fade >= 1) {
-          stems.shift();
-        }
-      }
+      ctx.restore();
     };
 
     const tick = (ts) => {
       const { w, h } = getSize();
 
-      // Reduced motion: draw one still frame (no loop)
+      // Reduced motion: one still frame
       if (prefersReducedMotionRef.current) {
         ctx.clearRect(0, 0, w, h);
         drawAtmosphere(w, h);
 
-        // Keep a single static stem snapshot if none exists
-        if (stemsRef.current.length === 0) stemsRef.current.push(createStem(w, h));
-        // draw whatever exists (no stepping)
-        for (const stem of stemsRef.current) drawStem(stem);
+        const sorted = [...bubblesRef.current].sort((a, b) => a.z - b.z);
+        for (const b of sorted) drawBubble(b, ts);
+
         return;
       }
 
       const last = lastTimeRef.current || ts;
-      const dt = clamp((ts - last) / 1000, 0.001, 0.04); // cap dt to avoid jumps
+      const dt = clamp((ts - last) / 1000, 0.001, 0.04);
       lastTimeRef.current = ts;
 
-      ensureChain(w, h);
+      const palette = getThemePalette();
 
-      // Update stems (step growth/fade)
-      for (const stem of stemsRef.current) {
-        stepStem(stem, dt, w, h);
+      // Keep count stable
+      const targetCount = 12;
+      while (bubblesRef.current.length < targetCount) {
+        bubblesRef.current.push(makeBubble(w, h, palette));
+      }
 
-        // Start fade when done growing
-        if (stem.state === "growing" && stem.segments.length >= stem.maxSegments) {
-          stem.state = "fading";
+      // Update
+      for (const b of bubblesRef.current) {
+        b.age += dt;
+
+        b.x += b.vx * dt;
+        b.y += b.vy * dt;
+
+        // If it drifts off screen, expire it
+        if (
+          b.x < -b.radius * 1.6 ||
+          b.x > w + b.radius * 1.6 ||
+          b.y < -b.radius * 1.9 ||
+          b.y > h + b.radius * 1.9
+        ) {
+          b.age = Math.max(b.age, b.lifespan * 0.92);
         }
       }
 
-      // If we have 2 stems, fade the oldest once the newest exists
-      if (stemsRef.current.length === 2) {
-        const oldest = stemsRef.current[0];
-        if (oldest.state !== "fading") oldest.state = "fading";
+      // Remove dead + respawn to target
+      bubblesRef.current = bubblesRef.current.filter((b) => b.age < b.lifespan);
+      while (bubblesRef.current.length < targetCount) {
+        bubblesRef.current.push(makeBubble(w, h, palette));
       }
 
       // Render
       ctx.clearRect(0, 0, w, h);
       drawAtmosphere(w, h);
 
-      // Draw oldest first so newest feels on top
-      for (const stem of stemsRef.current) drawStem(stem);
+      const sorted = [...bubblesRef.current].sort((a, b) => a.z - b.z);
+      for (const b of sorted) drawBubble(b, ts);
 
       rafRef.current = requestAnimationFrame(tick);
     };
 
     resize();
     window.addEventListener("resize", resize);
-
-    // Initialize one stem immediately
-    const { w, h } = getSize();
-    stemsRef.current = [createStem(w, h)];
-
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {

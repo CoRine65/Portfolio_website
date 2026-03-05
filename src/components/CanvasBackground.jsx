@@ -60,12 +60,28 @@ export default function CanvasBackground() {
     const getSize = () => ({ w: window.innerWidth, h: window.innerHeight });
 
     const getThemePalette = () => {
-      const root = getComputedStyle(document.documentElement);
-      const accent = root.getPropertyValue("--accent").trim() || "#3ebe8b";
-      const subtle = root.getPropertyValue("--bg-subtle").trim() || "#2b5a6c";
-      const text = root.getPropertyValue("--text-primary").trim() || "#e8eeef";
-      return [accent, subtle, text];
-    };
+  // Weighted palette = repeated entries
+  // (more repeats = more common)
+  return [
+    // blue (dominant)
+    "#4fa8ff",
+    "#4fa8ff",
+    "#4fa8ff",
+    "#4fa8ff",
+
+    // violet
+    "#9b8cff",
+    "#9b8cff",
+    "#9b8cff",
+
+    // rose/pink
+    "#e5a9be",
+    "#e8c5d1",
+
+    // soft yellow / gold (rare)
+    "#ffc96b",
+  ];
+};
 
     const makeBubble = (w, h, palette) => {
       const base = pick(palette);

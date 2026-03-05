@@ -301,6 +301,7 @@ nav a {
   display: none;
 }
 
+
 /*
 @keyframes dotsWidth {
   0%   { width: 0em; }
@@ -416,4 +417,21 @@ body.is-home .page {
 body.is-home .home-nav {
   margin-top: auto;
   padding-bottom: 32px; /* tweak */
+}
+
+/* Case meta list styling */
+.meta-list {
+  margin: 18px 0 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 10px;
+}
+
+.meta-list strong {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-right: 6px;
 }

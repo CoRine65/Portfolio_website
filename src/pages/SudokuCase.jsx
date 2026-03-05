@@ -3,6 +3,7 @@ import placeholder1 from "../assets/placeholder1.jpg";
 import placeholder2 from "../assets/placeholder2.jpg";
 import github from "../assets/github.svg";
 import linkedin from "../assets/linkedin.svg";
+import AirportFlipText from "../components/AirportFlipText";
 
 export default function SudokuCase() {
   return (
@@ -14,10 +15,19 @@ export default function SudokuCase() {
             and clean UX.
           </p>
 
-          <ul className="meta-list">
-            <li><strong>Stack:</strong> React + Vite </li>
-            <li><strong>Focus:</strong> UI + logic + polish </li>
-            <li><strong>Status:</strong> In progress </li>
+          <ul className="meta-list airport">
+            <li>
+              <strong>Stack:</strong>{" "}
+              <AirportFlipText text="React + Vite" active duration={620} stagger={16} />
+            </li>
+            <li>
+              <strong>Focus:</strong>{" "}
+              <AirportFlipText text="UI + data" active duration={620} stagger={16} />
+            </li>
+            <li>
+              <strong>Status:</strong>{" "}
+              <AirportFlipText text="In progress" active duration={620} stagger={16} />
+            </li>
           </ul>
         </>
       }

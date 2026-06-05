@@ -11,9 +11,9 @@ const cards = [
     meta: ["RAILS API + JWT", "HUMAN VS AI", "SYSTEM WRITEUP"],
   },
   {
-    to: "/projects/bakery",
-    title: "BAKERY",
-    meta: ["FRONT-END UI", "CART FLOW", "RESPONSIVE LAYOUT"],
+    to: "/projects/florist",
+    title: "Cat's Florals",
+    meta: ["FRONT-END UI", "RESPONSIVE LAYOUT"],
   },
   {
     to: "/about",

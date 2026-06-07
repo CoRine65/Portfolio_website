@@ -26,8 +26,9 @@ body {
   /* Fonts */
   --font-display: "IBM Plex Sans", Arial, sans-serif;
   --font-body: "Space Grotesk", Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
 
   /* Colors */
   --bg-base: #1a1c1e;
@@ -65,7 +66,12 @@ body {
 /* ============================
    3) Typography
 ============================ */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -178,14 +184,14 @@ nav a {
 
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255,255,255,0.03);
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 
   transform: translateZ(0);
   transition:
-  height 260ms ease,
-  border-color 240ms ease,
-  box-shadow 240ms ease,
-  background 240ms ease;
+    height 260ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease,
+    background 240ms ease;
 }
 
 /* whole card clickable */
@@ -231,13 +237,13 @@ nav a {
   bottom: auto;
 
   list-style: disc;
-  list-style-position: outside; 
+  list-style-position: outside;
   padding-left: 18px;
 
   margin: 0;
 
   display: grid;
-  gap: 2px;              /* tighter spacing between items */
+  gap: 2px; /* tighter spacing between items */
 
   opacity: 0;
   transform: translateY(10px);
@@ -249,11 +255,10 @@ nav a {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 12px;
-  line-height: 1.25;     /* tighter line spacing */
+  line-height: 1.25; /* tighter line spacing */
   color: var(--text-muted);
   opacity: 0.95;
 }
-
 
 /* Expanded state */
 .card:hover,
@@ -265,7 +270,7 @@ nav a {
 
   box-shadow:
     0 16px 44px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255,255,255,0.06);
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* title moves top-left */
@@ -280,7 +285,6 @@ nav a {
 /* meta fades in */
 .card:hover .cardMeta,
 .card:focus-within .cardMeta {
-
   opacity: 1;
   transform: translateY(0);
 }
@@ -300,7 +304,6 @@ nav a {
   content: none;
   display: none;
 }
-
 
 /*
 @keyframes dotsWidth {
@@ -365,6 +368,26 @@ nav a {
   }
 }
 
+.singleMedia {
+  display: flex;
+  justify-content: center;
+}
+
+.singleMedia .mediaBox {
+  width: min(100%, 760px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--accent-soft);
+}
+
+.singleMedia .mediaBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 /* ============================
    9) Simple nav + contact icons
 ============================ */
@@ -391,7 +414,7 @@ nav a {
   opacity: 1;
 }
 
-/* background */ 
+/* background */
 .bg-canvas {
   position: fixed;
   inset: 0;
@@ -434,4 +457,37 @@ body.is-home .home-nav {
   font-size: 12px;
   color: var(--text-muted);
   margin-right: 6px;
+}
+
+/*carousel*/
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.carousel img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.carouselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0.2rem 0.6rem;
+}
+
+.carouselBtn_left {
+  left: 0.5rem;
+}
+
+.carouselBtn_right {
+  right: 0.5rem;
 }
